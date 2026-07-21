@@ -1,0 +1,10 @@
+services:
+  quartz:
+    image: node:24-bookworm
+    working_dir: /site
+    volumes:
+      - .:/site
+    command: make -f /site/Makefile _serve
+    ports:
+      - "127.0.0.1:${QUARTZ_DEV_PORT:-8000}:8000"
+      - "127.0.0.1:3001:3001"
