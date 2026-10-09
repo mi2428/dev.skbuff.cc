@@ -24,6 +24,10 @@ body {
   font-weight: 300;
 }
 
+.page pre > code:not([data-line-numbers]) > [data-line]::before {
+  display: none;
+}
+
 .page .callout[data-callout] {
   --color: var(--secondary);
   --border: color-mix(in srgb, var(--color) 25%, var(--light));
@@ -95,10 +99,6 @@ body {
     accent-color: var(--secondary);
   }
 
-  & img[src$="garden-cycle-mocha.svg"] {
-    display: none;
-  }
-
   & ul.tags {
     gap: 0.35rem;
     margin: 0.15rem 0 0.35rem;
@@ -165,16 +165,6 @@ body {
         }
       }
     }
-  }
-}
-
-:root[saved-theme="dark"] .page {
-  & img[src$="garden-cycle.svg"] {
-    display: none;
-  }
-
-  & img[src$="garden-cycle-mocha.svg"] {
-    display: block;
   }
 }
 
