@@ -4,7 +4,7 @@ COMPOSE := docker compose -f docker-compose.dev.yml
 OUTPUT := /site/public
 _serve: OUTPUT := /site/.quartz-dev-public
 
-.PHONY: help build dev check _build _serve
+.PHONY: help build dev check note _build _serve
 
 ##@ Development
 
@@ -14,10 +14,35 @@ build: ## Build the site in Docker into public/
 dev: ## Start the Docker preview
 	$(COMPOSE) up
 
-check: ## ShellCheck the embedded shell commands
+check: ## Check the embedded shell commands and note creation
 	@set -o pipefail; $(MAKE) --no-print-directory -n _build | shellcheck -s bash -
 	@set -o pipefail; $(MAKE) --no-print-directory -n _serve | shellcheck -s bash -
 	@set -o pipefail; $(MAKE) --no-print-directory -n help | shellcheck -s bash -
+	@set -o pipefail; $(MAKE) --no-print-directory -n note | shellcheck -s bash -
+	@set -euo pipefail; \
+	tmpdir="$$(mktemp -d)"; trap 'rm -rf "$$tmpdir"' EXIT; mkdir "$$tmpdir/content"; \
+	printf 'test-note\n' | EDITOR=true $(MAKE) --no-print-directory -s -C "$$tmpdir" -f "$(CURDIR)/Makefile" note; \
+	file="$$tmpdir/content/$$(date +%F)-test-note.md"; \
+	test -f "$$file"; \
+	if printf 'test-note\n' | EDITOR=true $(MAKE) --no-print-directory -s -C "$$tmpdir" -f "$(CURDIR)/Makefile" note >/dev/null 2>&1; then \
+		printf 'duplicate note was overwritten\n' >&2; exit 1; \
+	fi; \
+	if printf '../invalid\n' | EDITOR=true $(MAKE) --no-print-directory -s -C "$$tmpdir" -f "$(CURDIR)/Makefile" note >/dev/null 2>&1; then \
+		printf 'invalid slug was accepted\n' >&2; exit 1; \
+	fi; \
+	diff -u <(printf '%s\n' '---' 'title: test-note' 'description: ""' "date: $$(date +%F)" "created: $$(date +%F)" 'tags: []' '---' '') "$$file"
+
+note: ## Create a dated note and open it in EDITOR
+	@set -euC; \
+	if [[ -t 0 ]]; then exec </dev/tty >/dev/tty 2>&1; fi; \
+	read -r -p 'slug: ' slug; \
+	if [[ ! "$$slug" =~ ^[a-z0-9]+(-[a-z0-9]+)*$$ ]]; then \
+		printf 'slug must use lowercase letters, digits and hyphens\n' >&2; exit 1; \
+	fi; \
+	date="$$(date +%F)"; \
+	file="content/$$date-$$slug.md"; \
+	printf '%s\n' '---' "title: $$slug" 'description: ""' "date: $$date" "created: $$date" 'tags: []' '---' '' > "$$file"; \
+	"$${EDITOR:-vi}" "$$file"
 
 ##@ Help
 
