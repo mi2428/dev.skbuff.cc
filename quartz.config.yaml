@@ -192,7 +192,7 @@ plugins:
       priority: 10
   - source: "@quartz-community/recent-notes"
     enabled: true
-    options:
+    options: &articleList
       title: ""
       limit: .inf
       showTags: false
@@ -201,6 +201,14 @@ plugins:
     layout:
       position: left
       priority: 50
+      display: desktop-only
+  - source: "@quartz-community/recent-notes"
+    enabled: true
+    options: *articleList
+    layout:
+      position: afterBody
+      priority: 50
+      display: mobile-only
   - source: "@quartz-community/bases-page"
     enabled: true
     options: {}
