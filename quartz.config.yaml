@@ -155,14 +155,17 @@ plugins:
     options:
       enablePreview: false
     layout:
-      position: left
+      position: beforeBody
       priority: 20
-      group: toolbar
+      group: titlebar
   - source: "@quartz-community/article-title"
     enabled: true
     layout:
       position: beforeBody
       priority: 10
+      group: titlebar
+      groupOptions:
+        grow: true
   - source: "@quartz-community/content-meta"
     enabled: true
     layout:
@@ -176,9 +179,9 @@ plugins:
   - source: "@quartz-community/darkmode"
     enabled: true
     layout:
-      position: left
+      position: beforeBody
       priority: 30
-      group: toolbar
+      group: titlebar
   - source: "@quartz-community/comments"
     enabled: false
     options:
@@ -213,8 +216,8 @@ plugins:
       display: all
 layout:
   groups:
-    toolbar:
-      priority: 35
+    titlebar:
+      priority: 10
       direction: row
       gap: 0.5rem
   byPageType:

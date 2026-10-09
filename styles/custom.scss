@@ -215,7 +215,7 @@ body {
 
     & > .sidebar.left {
       @media (min-width: 801px) {
-        padding: 2rem 1rem 1rem;
+        padding: 1.2rem 1rem 1rem;
       }
 
       & .recent-notes {
@@ -224,7 +224,7 @@ body {
         }
 
         & > ul.recent-ul {
-          margin-top: 0.5rem;
+          margin-top: 0;
 
           & > li {
             margin: 0.55rem 0;
@@ -257,6 +257,15 @@ body {
 
     & > .center {
       & .page-header {
+        & > .popover-hint > .flex-component {
+          width: 100%;
+          align-items: center;
+
+          & > :first-child {
+            min-width: 0;
+          }
+        }
+
         @media (min-width: 801px) {
           margin-top: 2rem;
         }
@@ -264,6 +273,7 @@ body {
         & .article-title {
           font-size: 1.35rem;
           font-weight: 500;
+          margin-top: 0;
           margin-bottom: 0.2rem;
         }
 
