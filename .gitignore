@@ -59,6 +59,7 @@ tags
 # Site-specific
 node_modules/
 public/
+.quartz-dev-public/
 .obsidian/
 private/
 !/content/tags/

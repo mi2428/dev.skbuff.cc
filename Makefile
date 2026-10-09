@@ -1,6 +1,8 @@
 SHELL := /bin/bash
 COMPOSE := docker compose -f docker-compose.dev.yml
 .DEFAULT_GOAL := help
+OUTPUT := /site/public
+_serve: OUTPUT := /site/.quartz-dev-public
 
 .PHONY: help build dev check _build _serve
 
@@ -41,4 +43,4 @@ _build _serve:
 	cp /site/styles/custom.scss "$$build_dir/quartz/styles/custom.scss"; \
 	cd "$$build_dir"; \
 	npm ci; \
-	npx quartz build -d /site/content -o /site/public $(if $(filter _serve,$@),--serve --port 8000)
+	npx quartz build -d /site/content -o "$(OUTPUT)" $(if $(filter _serve,$@),--serve --port 8000)
