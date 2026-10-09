@@ -37,6 +37,7 @@ _build _serve:
 	trap 'rm -rf "$$build_dir"' EXIT; \
 	git -c safe.directory=/site/quartz -C /site/quartz archive HEAD | tar -xf - -C "$$build_dir"; \
 	cp /site/quartz.config.yaml "$$build_dir/quartz.config.yaml"; \
+	cp /site/quartz.ts "$$build_dir/quartz.ts"; \
 	cp /site/styles/custom.scss "$$build_dir/quartz/styles/custom.scss"; \
 	cd "$$build_dir"; \
 	npm ci; \
