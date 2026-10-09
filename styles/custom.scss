@@ -6,6 +6,8 @@
   --ctp-peach: #fe640b;
   --ctp-yellow: #df8e1d;
   --ctp-red: #d20f39;
+  // Blue blended with Text (90:10) for readable small labels in both themes.
+  --note-accent: #2364e7;
 }
 
 :root[saved-theme="dark"] {
@@ -14,6 +16,7 @@
   --ctp-peach: #fab387;
   --ctp-yellow: #f9e2af;
   --ctp-red: #f38ba8;
+  --note-accent: #90b7f9;
 }
 
 body {
@@ -53,6 +56,14 @@ body {
 
 .page {
   max-width: 980px;
+
+  & a.internal.tag-link {
+    color: var(--note-accent);
+  }
+
+  & blockquote:not(.callout) {
+    border-left-color: var(--note-accent);
+  }
 
   & .recent-notes {
     & > h3 {
@@ -223,6 +234,7 @@ body {
 
           & > ul.tags > li > p {
             background: none;
+            color: var(--note-accent);
             padding: 0;
             font-size: 0.82rem;
             font-weight: 400;
@@ -309,7 +321,11 @@ body {
           }
 
           & > h1 { font-size: 1.45rem; }
-          & > h2 { font-size: 1.25rem; }
+          & > h2 {
+            font-size: 1.25rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px solid var(--lightgray);
+          }
           & > h3 { font-size: 1.08rem; }
         }
 
