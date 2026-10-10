@@ -66,6 +66,11 @@ body {
     margin-inline: 0;
   }
 
+  & p.meta:has(> time:empty),
+  & .content-meta > time:empty {
+    display: none;
+  }
+
   & .footnotes {
     font-size: 0.85rem;
 

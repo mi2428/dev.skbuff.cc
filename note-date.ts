@@ -45,12 +45,13 @@ export function backfillDate(path: string): Date | undefined {
   const [year, month, day] = date.split("-").map(Number)
   if (month && day) return
 
-  const label = !year ? "日付不明" : !month ? `${year}年` : `${year}年${month}月`
   // ponytail: Quartz only sorts full Dates; use proxy timestamps until it supports partial dates.
   const first = `${date.slice(0, 4)}-${month ? date.slice(5, 7) : "01"}-${day ? date.slice(8) : "01"}`
+  const start = year ? new Date(`${first}T00:00:00`) : new Date("0001-01-01T00:00:00Z")
+  const label = !year ? "" : !month ? String(year) : `${start.toLocaleString("en-US", { month: "short" })}, ${year}`
   const timestamp = year
-    ? new Date(`${first}T00:00:00`).getTime() - (month ? 1 : 2)
-    : new Date("0001-01-01T00:00:00Z").getTime()
+    ? start.getTime() - (month ? 1 : 2)
+    : start.getTime()
   return new BackfillDate(timestamp, label)
 }
 
