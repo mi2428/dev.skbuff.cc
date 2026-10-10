@@ -7,6 +7,8 @@ import { visit } from "unist-util-visit"
 import { h } from "preact"
 import { backfillDate } from "./note-date"
 
+const googleSiteVerification = "XFvvt8qqt1wgNZzBP9oxykccqi4W81Zkd9STqHnhFcI"
+
 componentRegistry.setOptionOverrides("@quartz-community/recent-notes", {
   filter: (page: { slug?: string }) => page.slug !== "404",
 })
@@ -59,6 +61,7 @@ config.plugins.transformers.push({
   ],
   externalResources: () => ({
     additionalHead: [
+      h("meta", { name: "google-site-verification", content: googleSiteVerification }),
       h("script", {
         src: "https://platform.twitter.com/widgets.js",
         async: true,
@@ -94,7 +97,7 @@ config.plugins.emitters.push({
     if (!latest) throw new Error("No dated articles found")
 
     const url = `/${latest.split("/").map(encodeURIComponent).join("/")}`
-    const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0;url=${url}"></head><body><a href="${url}">Read the latest note</a></body></html>`
+    const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="google-site-verification" content="${googleSiteVerification}"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0;url=${url}"></head><body><a href="${url}">Read the latest note</a></body></html>`
     yield await write({ ctx, slug: "index" as FullSlug, ext: ".html", content: html })
   },
 })
