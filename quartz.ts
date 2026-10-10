@@ -11,15 +11,30 @@ componentRegistry.setOptionOverrides("@quartz-community/recent-notes", {
 
 const config = await loadQuartzConfig()
 config.plugins.transformers.push({
-  name: "RemoveHeadingLinks",
+  name: "CleanRenderedMarkdown",
   htmlPlugins: () => [
     () => (tree: Root) => {
-      visit(tree, "element", (heading) => {
-        if (!/^h[1-6]$/.test(heading.tagName)) return
-        heading.children = heading.children.filter(
-          (child) =>
-            child.type !== "element" || child.tagName !== "a" || child.properties.role !== "anchor",
-        )
+      visit(tree, "element", (node) => {
+        if (/^h[1-6]$/.test(node.tagName)) {
+          node.children = node.children.filter(
+            (child) =>
+              child.type !== "element" || child.tagName !== "a" || child.properties.role !== "anchor",
+          )
+        }
+        if (node.tagName === "section" && "dataFootnotes" in node.properties) {
+          node.properties.ariaLabel = "脚注"
+          node.children = node.children.filter(
+            (child) => child.type !== "element" || child.properties.id !== "footnote-label",
+          )
+        }
+        if (node.tagName === "a" && "dataFootnoteRef" in node.properties) {
+          delete node.properties.ariaDescribedBy
+        }
+        if (node.tagName === "p") {
+          node.children = node.children.filter(
+            (child) => child.type !== "element" || !("dataFootnoteBackref" in child.properties),
+          )
+        }
       })
     },
   ],

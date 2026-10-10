@@ -66,6 +66,27 @@ body {
     margin-inline: 0;
   }
 
+  & .footnotes {
+    font-size: 0.85rem;
+
+    & :is(ol, li, p, a) {
+      color: var(--gray);
+    }
+
+    & a {
+      text-decoration: underline;
+    }
+
+    & > ol {
+      padding-inline-start: 0;
+      list-style-position: inside;
+
+      & li > p:first-child {
+        display: inline;
+      }
+    }
+  }
+
   & a.internal.tag-link {
     color: var(--note-accent);
   }
