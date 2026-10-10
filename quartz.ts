@@ -2,12 +2,28 @@ import { loadQuartzConfig, loadQuartzLayout } from "./quartz/plugins/loader/conf
 import { componentRegistry } from "./quartz/components/registry"
 import { write } from "./quartz/plugins/emitters/helpers"
 import type { FullSlug } from "./quartz/util/path"
+import type { Root } from "hast"
+import { visit } from "unist-util-visit"
 
 componentRegistry.setOptionOverrides("@quartz-community/recent-notes", {
   filter: (page: { slug?: string }) => page.slug !== "404",
 })
 
 const config = await loadQuartzConfig()
+config.plugins.transformers.push({
+  name: "RemoveHeadingLinks",
+  htmlPlugins: () => [
+    () => (tree: Root) => {
+      visit(tree, "element", (heading) => {
+        if (!/^h[1-6]$/.test(heading.tagName)) return
+        heading.children = heading.children.filter(
+          (child) =>
+            child.type !== "element" || child.tagName !== "a" || child.properties.role !== "anchor",
+        )
+      })
+    },
+  ],
+})
 config.plugins.emitters.push({
   name: "LatestArticleRedirect",
   async *emit(ctx, content) {
