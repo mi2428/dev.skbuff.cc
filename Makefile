@@ -68,4 +68,10 @@ _build _serve:
 	cp /site/styles/custom.scss "$$build_dir/quartz/styles/custom.scss"; \
 	cd "$$build_dir"; \
 	npm ci; \
+	target="$@"; \
+	if [[ "$$target" == "_serve" ]]; then \
+		node -e 'const fs = require("node:fs"); const [src, dest] = process.argv.slice(1); fs.watchFile(src, { interval: 500 }, (now, prev) => { if (now.mtimeMs !== prev.mtimeMs) fs.copyFileSync(src, dest) })' /site/styles/custom.scss "$$build_dir/quartz/styles/custom.scss" & \
+		watcher_pid=$$!; \
+		trap 'kill "$$watcher_pid" 2>/dev/null || :; rm -rf "$$build_dir"' EXIT; \
+	fi; \
 	npx quartz build -d /site/content -o "$(OUTPUT)" $(if $(filter _serve,$@),--serve --port 8000)

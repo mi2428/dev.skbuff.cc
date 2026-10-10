@@ -61,6 +61,11 @@ body {
 .page {
   max-width: 980px;
 
+  & .table-container > table {
+    width: 100%;
+    margin-inline: 0;
+  }
+
   & a.internal.tag-link {
     color: var(--note-accent);
   }
