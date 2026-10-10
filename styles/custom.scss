@@ -65,6 +65,19 @@ body {
     color: var(--note-accent);
   }
 
+  & h2:has(> a.internal.tag-link) {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 1rem 0 0;
+
+    & > a {
+      background: none;
+      padding: 0;
+      font-weight: inherit;
+      line-height: inherit;
+    }
+  }
+
   & blockquote:not(.callout) {
     border-left-color: var(--note-accent);
   }
