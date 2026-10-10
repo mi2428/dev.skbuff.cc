@@ -5,6 +5,7 @@ import type { FullSlug } from "./quartz/util/path"
 import type { Root } from "hast"
 import { visit } from "unist-util-visit"
 import { h } from "preact"
+import { backfillDate } from "./note-date"
 
 componentRegistry.setOptionOverrides("@quartz-community/recent-notes", {
   filter: (page: { slug?: string }) => page.slug !== "404",
@@ -12,7 +13,13 @@ componentRegistry.setOptionOverrides("@quartz-community/recent-notes", {
 
 const config = await loadQuartzConfig()
 config.plugins.transformers.push({
-  name: "CleanRenderedMarkdown",
+  name: "SiteMarkupAndDates",
+  markdownPlugins: () => [
+    () => (_tree, file) => {
+      const date = backfillDate(file.data.relativePath ?? "")
+      if (date && file.data.dates) file.data.dates.created = date
+    },
+  ],
   htmlPlugins: () => [
     () => (tree: Root) => {
       visit(tree, "element", (node) => {
@@ -71,9 +78,10 @@ config.plugins.emitters.push({
       .filter((data) => data.slug && /^\d{4}-\d{2}-\d{2}-.+\.md$/.test(data.relativePath?.split("/").pop() ?? ""))
 
     const timestamp = (data: (typeof articles)[number]) => {
-      const date = data.frontmatter?.created ?? data.frontmatter?.date ?? data.relativePath?.split("/").pop()?.slice(0, 10)
-      const value = Date.parse(String(date))
-      if (!Number.isFinite(value)) throw new Error(`Invalid creation date for ${data.slug}`)
+      const value = data.dates?.created?.getTime()
+      if (value === undefined || !Number.isFinite(value)) {
+        throw new Error(`Invalid creation date for ${data.slug}`)
+      }
       return value
     }
 

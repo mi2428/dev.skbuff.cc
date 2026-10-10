@@ -2,6 +2,7 @@ SHELL := /bin/bash
 COMPOSE := docker compose -f docker-compose.dev.yml
 .DEFAULT_GOAL := help
 OUTPUT := /site/public
+NOTE_DATE := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))note-date.ts
 _serve: OUTPUT := /site/.quartz-dev-public
 
 .PHONY: help build dev check note _build _serve
@@ -19,6 +20,7 @@ check: ## Check the embedded shell commands and note creation
 	@set -o pipefail; $(MAKE) --no-print-directory -n _serve | shellcheck -s bash -
 	@set -o pipefail; $(MAKE) --no-print-directory -n help | shellcheck -s bash -
 	@set -o pipefail; $(MAKE) --no-print-directory -n note | shellcheck -s bash -
+	@node --test "$(dir $(NOTE_DATE))note-date.test.ts"
 	@set -euo pipefail; \
 	tmpdir="$$(mktemp -d)"; trap 'rm -rf "$$tmpdir"' EXIT; mkdir "$$tmpdir/content"; \
 	printf 'test-note\n' | EDITOR=true $(MAKE) --no-print-directory -s -C "$$tmpdir" -f "$(CURDIR)/Makefile" note; \
@@ -30,18 +32,33 @@ check: ## Check the embedded shell commands and note creation
 	if printf '../invalid\n' | EDITOR=true $(MAKE) --no-print-directory -s -C "$$tmpdir" -f "$(CURDIR)/Makefile" note >/dev/null 2>&1; then \
 		printf 'invalid slug was accepted\n' >&2; exit 1; \
 	fi; \
-	diff -u <(printf '%s\n' '---' 'title: test-note' 'description: ""' "date: $$(date +%F)" "created: $$(date +%F)" 'tags: []' '---' '') "$$file"
+	diff -u <(printf '%s\n' '---' 'title: test-note' 'description: ""' "date: $$(date +%F)" "created: $$(date +%F)" 'tags: []' '---' '') "$$file"; \
+	i=0; \
+	for spec in '2026-01-03|2026-01-03|2026-01-03' '2026-01|2026-01-00|"2026-01"' '2026-01-dd|2026-01-00|"2026-01"' '2026-mm-dd|2026-00-00|"2026"' '2026|2026-00-00|"2026"' '|0000-00-00|""'; do \
+		IFS='|' read -r input normalized frontdate <<< "$$spec"; \
+		((i+=1)); slug="backfill-$$i"; \
+		printf '%s\n' "$$slug" | EDITOR=true $(MAKE) --no-print-directory -s -C "$$tmpdir" -f "$(CURDIR)/Makefile" note DATE="$$input"; \
+		diff -u <(printf '%s\n' '---' "title: $$slug" 'description: ""' "date: $$frontdate" "created: $$frontdate" 'tags: []' '---' '') "$$tmpdir/content/$$normalized-$$slug.md"; \
+	done; \
+	if printf 'invalid-date\n' | EDITOR=true $(MAKE) --no-print-directory -s -C "$$tmpdir" -f "$(CURDIR)/Makefile" note DATE=2026-02-29 >/dev/null 2>&1; then \
+		printf 'invalid DATE was accepted\n' >&2; exit 1; \
+	fi
 
-note: ## Create a dated note and open it in EDITOR
+note: ## Create a note (DATE=YYYY-MM-DD, YYYY-MM, YYYY or empty)
 	@set -euC; \
 	if [[ -t 0 ]]; then exec </dev/tty >/dev/tty 2>&1; fi; \
 	read -r -p 'slug: ' slug; \
 	if [[ ! "$$slug" =~ ^[a-z0-9]+(-[a-z0-9]+)*$$ ]]; then \
 		printf 'slug must use lowercase letters, digits and hyphens\n' >&2; exit 1; \
 	fi; \
-	date="$$(date +%F)"; \
+	date="$$(node "$(NOTE_DATE)" "$${DATE-$$(date +%F)}")"; \
 	file="content/$$date-$$slug.md"; \
-	printf '%s\n' '---' "title: $$slug" 'description: ""' "date: $$date" "created: $$date" 'tags: []' '---' '' > "$$file"; \
+	frontdate="$$date"; \
+	if [[ "$$date" == *-00-00 ]]; then frontdate="$${date:0:4}"; fi; \
+	if [[ "$$date" == *-00 && "$$frontdate" == "$$date" ]]; then frontdate="$${date:0:7}"; fi; \
+	if [[ "$$frontdate" == 0000 ]]; then frontdate=''; fi; \
+	if [[ "$$frontdate" != "$$date" ]]; then frontdate="\"$$frontdate\""; fi; \
+	printf '%s\n' '---' "title: $$slug" 'description: ""' "date: $$frontdate" "created: $$frontdate" 'tags: []' '---' '' > "$$file"; \
 	"$${EDITOR:-vi}" "$$file"
 
 ##@ Help
@@ -65,6 +82,7 @@ _build _serve:
 	git -c safe.directory=/site/quartz -C /site/quartz archive HEAD | tar -xf - -C "$$build_dir"; \
 	cp /site/quartz.config.yaml "$$build_dir/quartz.config.yaml"; \
 	cp /site/quartz.ts "$$build_dir/quartz.ts"; \
+	cp /site/note-date.ts "$$build_dir/note-date.ts"; \
 	cp /site/styles/custom.scss "$$build_dir/quartz/styles/custom.scss"; \
 	cd "$$build_dir"; \
 	npm ci; \
