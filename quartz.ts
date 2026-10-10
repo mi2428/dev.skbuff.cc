@@ -4,6 +4,7 @@ import { write } from "./quartz/plugins/emitters/helpers"
 import type { FullSlug } from "./quartz/util/path"
 import type { Root } from "hast"
 import { visit } from "unist-util-visit"
+import { h } from "preact"
 
 componentRegistry.setOptionOverrides("@quartz-community/recent-notes", {
   filter: (page: { slug?: string }) => page.slug !== "404",
@@ -15,6 +16,13 @@ config.plugins.transformers.push({
   htmlPlugins: () => [
     () => (tree: Root) => {
       visit(tree, "element", (node) => {
+        if (
+          node.tagName === "blockquote" &&
+          Array.isArray(node.properties.className) &&
+          node.properties.className.includes("twitter-tweet")
+        ) {
+          node.properties.dataAlign ??= "center"
+        }
         if (/^h[1-6]$/.test(node.tagName)) {
           node.children = node.children.filter(
             (child) =>
@@ -38,6 +46,22 @@ config.plugins.transformers.push({
       })
     },
   ],
+  externalResources: () => ({
+    additionalHead: [
+      h("script", {
+        src: "https://platform.twitter.com/widgets.js",
+        async: true,
+        "data-persist": true,
+      }),
+    ],
+    js: [
+      {
+        loadTime: "afterDOMReady",
+        contentType: "inline",
+        script: 'document.addEventListener("nav", () => window.twttr?.widgets?.load())',
+      },
+    ],
+  }),
 })
 config.plugins.emitters.push({
   name: "LatestArticleRedirect",
