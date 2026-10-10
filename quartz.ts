@@ -14,7 +14,6 @@ componentRegistry.setOptionOverrides("@quartz-community/recent-notes", {
 const config = await loadQuartzConfig()
 const pageDispatcher = config.plugins.emitters.find((emitter) => emitter.name === "PageTypeDispatcher")
 if (!pageDispatcher) throw new Error("PageTypeDispatcher is required")
-// ponytail: preview re-renders all pages so shared note lists stay fresh; revisit if rebuilds get slow.
 delete pageDispatcher.partialEmit
 
 config.plugins.transformers.push({
