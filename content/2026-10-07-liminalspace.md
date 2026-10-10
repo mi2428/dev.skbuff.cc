@@ -1,6 +1,6 @@
 ---
 title: Liminal Space
-date: 2021-10-16
+date: 2026-10-07
 tags: [til, arts, meme]
 ---
 
