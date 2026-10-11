@@ -337,6 +337,13 @@ body {
         & .markdown-rendered {
           line-height: 1.55;
 
+          @media all and ($mobile) {
+            & :is(p, li, a) {
+              text-wrap: wrap;
+              line-break: loose;
+            }
+          }
+
           & > p,
           & > ul,
           & > ol {
