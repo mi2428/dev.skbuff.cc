@@ -97,7 +97,7 @@ config.plugins.emitters.push({
     if (!latest) throw new Error("No dated articles found")
 
     const url = `/${latest.split("/").map(encodeURIComponent).join("/")}`
-    const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="google-site-verification" content="${googleSiteVerification}"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0;url=${url}"></head><body><a href="${url}">Read the latest note</a></body></html>`
+    const html = `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>最新の記事へ移動しています</title><meta name="google-site-verification" content="${googleSiteVerification}"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0;url=${url}"></head><body style="font-family:system-ui,sans-serif"><p>自動で移動しない場合は、<a href="${url}">こちらをクリック</a>してください。</p></body></html>`
     yield await write({ ctx, slug: "index" as FullSlug, ext: ".html", content: html })
   },
 })
