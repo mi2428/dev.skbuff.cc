@@ -43,7 +43,7 @@ config.plugins.transformers.push({
           )
         }
         if (node.tagName === "section" && "dataFootnotes" in node.properties) {
-          node.properties.ariaLabel = "脚注"
+          node.properties.ariaLabel = "Footnote"
           node.children = node.children.filter(
             (child) => child.type !== "element" || child.properties.id !== "footnote-label",
           )
@@ -62,6 +62,40 @@ config.plugins.transformers.push({
   externalResources: () => ({
     additionalHead: [
       h("meta", { name: "google-site-verification", content: googleSiteVerification }),
+      h("script", {
+        dangerouslySetInnerHTML: {
+          __html: `(() => {
+            const root = document.documentElement
+            root.style.visibility = "hidden"
+            addEventListener("DOMContentLoaded", () => {
+              let done = false
+              const finish = (ready) => {
+                if (done) return
+                done = true
+                clearTimeout(timeout)
+                if (!ready) {
+                  for (const child of document.body.children) child.style.display = "none"
+                  const error = document.createElement("p")
+                  error.textContent = "Unable to load the font. Please reload the page."
+                  document.body.append(error)
+                }
+                root.style.visibility = ""
+              }
+              const timeout = setTimeout(() => finish(false), 10000)
+              document.fonts.ready.then(() => {
+                const noto = [...document.fonts].filter((font) => font.family === "Noto Sans JP" && font.status !== "unloaded")
+                finish(noto.length > 0 && noto.every((font) => font.status === "loaded"))
+              }, () => finish(false))
+            }, { once: true })
+          })()`,
+        },
+      }),
+      h("link", { rel: "preconnect", href: "https://fonts.googleapis.com" }),
+      h("link", { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" }),
+      h("link", {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Noto%20Sans%20JP%3Awght%40300%3B400%3B500%3B600&family=IBM%20Plex%20Mono%3Awght%40400%3B600&display=block",
+      }),
       h("script", {
         src: "https://platform.twitter.com/widgets.js",
         async: true,
@@ -97,7 +131,7 @@ config.plugins.emitters.push({
     if (!latest) throw new Error("No dated articles found")
 
     const url = `/${latest.split("/").map(encodeURIComponent).join("/")}`
-    const html = `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>最新の記事へ移動しています</title><meta name="google-site-verification" content="${googleSiteVerification}"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0;url=${url}"></head><body style="font-family:system-ui,sans-serif"><p>自動で移動しない場合は、<a href="${url}">こちらをクリック</a>してください。</p></body></html>`
+    const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Redirecting to the latest article</title><meta name="google-site-verification" content="${googleSiteVerification}"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0;url=${url}"></head><body style="font-family:system-ui,sans-serif"><p>If you are not redirected automatically, <a href="${url}">click here</a>.</p></body></html>`
     yield await write({ ctx, slug: "index" as FullSlug, ext: ".html", content: html })
   },
 })

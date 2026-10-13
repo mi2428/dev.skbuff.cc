@@ -95,14 +95,10 @@ plugins:
   - source: "@quartz-community/quartz-fonts"
     enabled: true
     options:
-      fontOrigin: googleFonts
-      header:
-        name: Noto Sans JP
-        weights: [400, 500]
-      body:
-        name: Noto Sans JP
-        weights: [300, 400, 500, 600]
-        includeItalic: false
+      fontOrigin: local
+      header: '"Noto Sans JP", system-ui, sans-serif'
+      body: '"Noto Sans JP", system-ui, sans-serif'
+      code: '"IBM Plex Mono", ui-monospace, monospace'
   - source: "@quartz-themes/core"
     enabled: false
     options:
