@@ -350,6 +350,11 @@ body {
             margin: 0.6rem 0;
           }
 
+          & p > img {
+            display: block;
+            margin: 0.25rem auto;
+          }
+
           & > h1,
           & > h2,
           & > h3,
