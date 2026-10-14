@@ -64,6 +64,10 @@ body {
   & .table-container > table {
     width: 100%;
     margin-inline: 0;
+
+    & > * {
+      line-height: 1.45;
+    }
   }
 
   & p.meta:has(> time:empty),
@@ -353,6 +357,22 @@ body {
           & p > img {
             display: block;
             margin: 0.25rem auto;
+          }
+
+          & p > a:has(> img) {
+            display: block;
+            width: fit-content;
+            max-width: 100%;
+            margin: 0.25rem auto;
+
+            & > img {
+              display: block;
+              margin: 0;
+            }
+
+            & > .external-icon {
+              display: none;
+            }
           }
 
           & > h1,
