@@ -82,6 +82,10 @@ body {
       color: var(--gray);
     }
 
+    & :is(li, p) {
+      line-height: 1.4;
+    }
+
     & a {
       text-decoration: underline;
     }
