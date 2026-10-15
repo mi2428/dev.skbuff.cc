@@ -1,12 +1,10 @@
 ---
-title: アグラオネマ
+title: アグラオネマ品種別一覧
 description: ""
 date: ""
 created: ""
 tags: [til]
 ---
-
-# アグラオネマ品種別一覧
 
 ## 緑・シルバー系
 
