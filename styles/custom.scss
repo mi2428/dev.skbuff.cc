@@ -127,6 +127,15 @@ body {
       display: none;
     }
 
+    & .meta {
+      display: none;
+    }
+
+    & .desc h3,
+    & .desc h3 a {
+      line-height: 1rem;
+    }
+
     & > ul.recent-ul {
       margin: 0;
 
@@ -456,15 +465,6 @@ body {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
-
-      & .meta {
-        display: none;
-      }
-
-      & .desc h3,
-      & .desc h3 a {
-        line-height: 1rem;
-      }
     }
   }
 }
