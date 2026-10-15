@@ -1,5 +1,10 @@
 import { loadQuartzConfig, loadQuartzLayout } from "./quartz/plugins/loader/config-loader"
 import { componentRegistry } from "./quartz/components/registry"
+import { External } from "./quartz/components/external"
+import Flex from "./quartz/components/Flex"
+import type { QuartzComponent } from "./quartz/components/types"
+import { registerCondition } from "./quartz/plugins/loader/conditions"
+import { PageTypeDispatcher } from "./quartz/plugins/pageTypes/dispatcher"
 import { write } from "./quartz/plugins/emitters/helpers"
 import type { FullSlug } from "./quartz/util/path"
 import type { Root } from "hast"
@@ -9,14 +14,17 @@ import { backfillDate } from "./note-date"
 
 const googleSiteVerification = "XFvvt8qqt1wgNZzBP9oxykccqi4W81Zkd9STqHnhFcI"
 
+registerCondition("tag-index", ({ fileData }) => fileData.slug === "tags/index")
+
 componentRegistry.setOptionOverrides("@quartz-community/recent-notes", {
   filter: (page: { slug?: string }) => page.slug !== "404",
 })
 
 const config = await loadQuartzConfig()
-const pageDispatcher = config.plugins.emitters.find((emitter) => emitter.name === "PageTypeDispatcher")
-if (!pageDispatcher) throw new Error("PageTypeDispatcher is required")
-delete pageDispatcher.partialEmit
+const pageDispatcherIndex = config.plugins.emitters.findIndex(
+  (emitter) => emitter.name === "PageTypeDispatcher",
+)
+if (pageDispatcherIndex < 0) throw new Error("PageTypeDispatcher is required")
 
 config.plugins.transformers.push({
   name: "SiteMarkupAndDates",
@@ -135,5 +143,44 @@ config.plugins.emitters.push({
     yield await write({ ctx, slug: "index" as FullSlug, ext: ".html", content: html })
   },
 })
-export default config
 export const layout = await loadQuartzLayout()
+const TagsLink: QuartzComponent = () =>
+  h(
+    "a",
+    { class: "tags-button", href: "/tags", "aria-label": "タグ一覧", title: "タグ一覧" },
+    h(
+      "svg",
+      {
+        width: 20,
+        height: 20,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: "currentColor",
+        strokeWidth: 2,
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+        "aria-hidden": "true",
+      },
+      h("path", {
+        d: "M20.59 13.41 13.41 20.59a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z",
+      }),
+      h("circle", { cx: 7, cy: 7, r: 1 }),
+    ),
+  )
+const titlebar = Flex({
+  components: [
+    { Component: External("ArticleTitle"), grow: true },
+    { Component: External("Search", { enablePreview: false }) },
+    { Component: TagsLink },
+    { Component: External("Darkmode") },
+  ],
+  gap: "0.5rem",
+})
+for (const pageLayout of [layout.defaults, ...Object.values(layout.byPageType)]) {
+  // The priority-10 titlebar group is first in each non-empty beforeBody layout.
+  if (pageLayout.beforeBody?.length) pageLayout.beforeBody[0] = titlebar
+}
+const pageDispatcher = PageTypeDispatcher(layout)
+delete pageDispatcher.partialEmit
+config.plugins.emitters[pageDispatcherIndex] = pageDispatcher
+export default config

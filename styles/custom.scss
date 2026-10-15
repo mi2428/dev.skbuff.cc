@@ -239,6 +239,39 @@ body {
   font-weight: 500;
 }
 
+.page .tags-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  color: var(--dark);
+
+  &:focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: 2px;
+  }
+}
+
+.page .graph > .graph-outer {
+  aspect-ratio: 1;
+  height: auto;
+}
+
+body[data-slug="tags/index"] {
+  & .center > hr,
+  & .graph > h3,
+  & .popover-hint > article + p {
+    display: none;
+  }
+
+  @media all and ($mobile) {
+    & .center > .page-footer > .mobile-only {
+      display: none;
+    }
+  }
+}
+
 .page .search {
   min-width: 0;
   max-width: none;
@@ -457,8 +490,8 @@ body {
     }
 
     @media (min-width: 801px) {
-      & > .center > hr:has(+ .page-footer > .mobile-only),
-      & > .center > .page-footer:has(> .mobile-only) {
+      & > .center > hr:has(+ .page-footer > .mobile-only:only-child),
+      & > .center > .page-footer:has(> .mobile-only:only-child) {
         display: none;
       }
     }

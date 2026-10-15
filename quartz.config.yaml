@@ -146,6 +146,15 @@ plugins:
     enabled: true
   - source: "@quartz-community/tag-page"
     enabled: true
+  - source: "@quartz-community/graph"
+    enabled: true
+    options:
+      localGraph:
+        depth: -1
+    layout:
+      position: afterBody
+      priority: 60
+      condition: tag-index
   - source: "@quartz-community/search"
     enabled: true
     options:
