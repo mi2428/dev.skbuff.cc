@@ -100,6 +100,11 @@ body {
     color: var(--note-accent);
   }
 
+  & article a > code {
+    color: inherit;
+    font-weight: 600;
+  }
+
   & h2:has(> a.internal.tag-link) {
     font-size: 1rem;
     font-weight: 500;
@@ -451,6 +456,15 @@ body {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
+
+      & .meta {
+        display: none;
+      }
+
+      & .desc h3,
+      & .desc h3 a {
+        line-height: 1rem;
+      }
     }
   }
 }
