@@ -26,7 +26,8 @@ configuration:
         gray: "#5c5f77"
         darkgray: "#4c4f69"
         dark: "#4c4f69"
-        secondary: "#8839ef"
+        # Darker Latte Teal for readable small links on the light background.
+        secondary: "#13767d"
         tertiary: "#4c4f69"
         highlight: "#e6e9ef"
         textHighlight: "#ccd0da"
@@ -36,7 +37,7 @@ configuration:
         gray: "#a6adc8"
         darkgray: "#bac2de"
         dark: "#cdd6f4"
-        secondary: "#cba6f7"
+        secondary: "#94e2d5"
         tertiary: "#89b4fa"
         highlight: "#313244"
         textHighlight: "#45475a"
